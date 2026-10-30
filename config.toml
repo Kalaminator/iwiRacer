@@ -1,0 +1,266 @@
+# Written by config_gui.py.
+
+[stick]
+target = "LEFT"
+center_x = 6
+center_y = -4
+deadzone = 8
+max = 82
+anti_deadzone = 0
+invert_x = false
+invert_y = true
+
+[buttons]
+BTN_SOUTH = "BTN_SOUTH"
+BTN_EAST = "RT"
+BTN_1 = "BTN_TR"
+BTN_2 = "BTN_Y"
+KEY_NEXT = "BTN_START"
+KEY_PREVIOUS = "BTN_SELECT"
+BTN_MODE = "BTN_MODE"
+KEY_UP = "DPAD_UP"
+KEY_DOWN = "DPAD_DOWN"
+KEY_LEFT = "DPAD_LEFT"
+KEY_RIGHT = "DPAD_RIGHT"
+BTN_C = "BTN_EAST"
+BTN_Z = "BTN_X"
+
+[rumble]
+enabled = true
+
+[[motion]]
+enabled = false
+source = "WIIMOTE_X"
+target = "ABS_X"
+center = 0
+deadzone = 10
+max = 100
+anti_deadzone = 0
+invert = false
+smoothing = 0.7
+
+[[motion]]
+enabled = true
+source = "WIIMOTE_Y"
+target = "POD_RIGHT"
+center = 0
+deadzone = 15
+max = 70
+anti_deadzone = 0
+invert = true
+smoothing = 0.6
+
+[[motion]]
+enabled = false
+source = "WIIMOTE_Z"
+target = "ABS_RY"
+center = 0
+deadzone = 10
+max = 100
+anti_deadzone = 0
+invert = false
+smoothing = 0.7
+
+[[motion]]
+enabled = true
+source = "WIIMOTE_SHAKE"
+target = "BTN_X"
+center = 0
+deadzone = 100
+max = 300
+anti_deadzone = 0
+invert = false
+smoothing = 0.0
+
+[[motion]]
+enabled = true
+source = "NUNCHUK_X"
+target = "ABS_X"
+center = 0
+deadzone = 15
+max = 120
+anti_deadzone = 25
+invert = false
+smoothing = 0.7
+
+[[motion]]
+enabled = true
+source = "NUNCHUK_Y"
+target = "POD_LEFT"
+center = 0
+deadzone = 30
+max = 135
+anti_deadzone = 0
+invert = true
+smoothing = 0.6
+
+[[motion]]
+enabled = false
+source = "NUNCHUK_Z"
+target = "ABS_Z"
+center = 0
+deadzone = 20
+max = 190
+anti_deadzone = 0
+invert = false
+smoothing = 0.7
+
+[[motion]]
+enabled = true
+source = "NUNCHUK_SHAKE"
+target = "BTN_Y"
+center = 90
+deadzone = 100
+max = 300
+anti_deadzone = 0
+invert = false
+smoothing = 0.0
+
+[[motion]]
+enabled = false
+source = "IR_X"
+target = "ABS_RX"
+center = 512
+deadzone = 30
+max = 400
+anti_deadzone = 0
+invert = true
+smoothing = 0.5
+
+[[motion]]
+enabled = false
+source = "IR_Y"
+target = "ABS_RY"
+center = 384
+deadzone = 30
+max = 300
+anti_deadzone = 0
+invert = true
+smoothing = 0.5
+
+[[motion]]
+enabled = false
+source = "IR_DIST"
+target = "ABS_Z"
+center = 170
+deadzone = 15
+max = 80
+anti_deadzone = 0
+invert = false
+smoothing = 0.5
+
+[[motion]]
+enabled = false
+source = "WIIMOTE_PITCH"
+target = "POD_RIGHT"
+center = 0
+deadzone = 8
+max = 45
+anti_deadzone = 0
+invert = true
+smoothing = 0.2
+
+[[motion]]
+enabled = false
+source = "WIIMOTE_ROLL"
+target = "ABS_X"
+center = 0
+deadzone = 12
+max = 60
+anti_deadzone = 25
+invert = false
+smoothing = 0.2
+
+[[motion]]
+enabled = false
+source = "WIIMOTE_YAW"
+target = "ABS_RX"
+center = 0
+deadzone = 5
+max = 45
+anti_deadzone = 0
+invert = false
+smoothing = 0.2
+
+[[motion]]
+enabled = false
+source = "GYRO_PITCH"
+target = "BTN_SOUTH"
+center = 0
+deadzone = 250
+max = 350
+anti_deadzone = 0
+invert = false
+smoothing = 0.0
+
+[[motion]]
+enabled = false
+source = "GYRO_ROLL"
+target = "BTN_X"
+center = 0
+deadzone = 250
+max = 350
+anti_deadzone = 0
+invert = false
+smoothing = 0.0
+
+[[motion]]
+enabled = false
+source = "GYRO_YAW"
+target = "BTN_X"
+center = 0
+deadzone = 250
+max = 350
+anti_deadzone = 0
+invert = false
+smoothing = 0.0
+
+[two_wiimotes]
+enabled = false
+swap = false
+center_left = 0
+center_right = 0
+deadzone = 15
+max = 70
+invert = true
+
+[left_buttons]
+BTN_SOUTH = "BTN_EAST"
+BTN_EAST = "BTN_X"
+BTN_1 = "BTN_TL"
+BTN_2 = "BTN_Y"
+KEY_NEXT = "BTN_START"
+KEY_PREVIOUS = "BTN_SELECT"
+BTN_MODE = "BTN_MODE"
+KEY_UP = "DPAD_UP"
+KEY_DOWN = "DPAD_DOWN"
+KEY_LEFT = "DPAD_LEFT"
+KEY_RIGHT = "DPAD_RIGHT"
+
+[motionplus]
+invert_pitch = false
+invert_roll = false
+invert_yaw = false
+accel_time = 1.0
+yaw_return = 3.0
+
+[mouse]
+enabled = false
+toggle = "BTN_MODE"
+speed = 1000
+curve = 2.0
+
+[mouse_buttons]
+BTN_SOUTH = "BTN_LEFT"
+BTN_EAST = "BTN_RIGHT"
+BTN_1 = "BTN_MIDDLE"
+BTN_2 = "KEY_LEFTMETA"
+KEY_NEXT = "KEY_ENTER"
+KEY_PREVIOUS = "KEY_ESC"
+BTN_MODE = ""
+KEY_UP = "WHEEL_UP"
+KEY_DOWN = "WHEEL_DOWN"
+KEY_LEFT = "KEY_LEFT"
+KEY_RIGHT = "KEY_RIGHT"
+BTN_C = "BTN_RIGHT"
+BTN_Z = "BTN_LEFT"
