@@ -2,7 +2,7 @@
 Description=Wiimote + Nunchuk as Xbox 360 pad
 
 [Service]
-ExecStart=%h/Documents/Mando/wiimote-linux/.venv/bin/python %h/Documents/Mando/wiimote-linux/wiimote2xbox.py
+ExecStart="@DIR@/.venv/bin/python" "@DIR@/wiimote2xbox.py"
 Restart=on-failure
 RestartSec=3
 RestartForceExitStatus=SIGHUP

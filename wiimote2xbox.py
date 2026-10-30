@@ -84,7 +84,9 @@ class Axis:
 
 
 def pod_drive(left, right):
-    """Podracer mix (HOSAS Binder "Hybrid Preserve Thrust"), inputs and output -1..1, + = thrust, - = brake.
+    """Podracer mix, inputs and output -1..1, + = thrust, - = brake.
+
+    Adapted from "Hybrid Preserve Thrust" in Galactic Racer HOSAS/HOTAS Binder, (C) 2026 JaffaQuake, GPLv3.
 
     Both forward: strongest wins, so steering costs no thrust. One back: it scrubs the other's thrust.
     Both back: average."""

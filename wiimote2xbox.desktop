@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Wiimote → Xbox 360
-Comment=Mapeo y prueba del Wiimote como mando Xbox
-Exec=sh -c '"$HOME/Documents/Mando/wiimote-linux/.venv/bin/python" "$HOME/Documents/Mando/wiimote-linux/config_gui.py"'
+Name=iwiRacer
+Comment=Configura los mandos de Wii como un mando Xbox
+Exec="@DIR@/.venv/bin/python" "@DIR@/config_gui.py"
 Icon=input-gaming
-Categories=Settings;Game;
+Categories=Game;
