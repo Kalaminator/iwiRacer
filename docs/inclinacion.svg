@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 345" width="640" height="345" role="img" aria-label="Vista de lado de un Wiimote. La punta hacia abajo da empuje, con el máximo a 44 grados. La punta hacia arriba frena. Entre más y menos 5 grados no pasa nada."><style>.l{color:#0b6db5}.r{color:#bd5600}text{font-family:sans-serif}</style><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#14222b"/>
+    </marker>
+    <g id="remote">
+      <rect x="-30" y="-6.5" width="60" height="13" rx="4" fill="currentColor"/>
+      <rect x="22" y="-6.5" width="8" height="13" rx="2" fill="#14222b" opacity=".55"/>
+      <path d="M4 6.5q2 5 9 5v-5z" fill="currentColor"/>
+      <circle cx="10" cy="-6.5" r="2" fill="#f7fafb"/>
+    </g>
+    <g id="levers">
+      <text x="6" y="46" font-size="13" font-weight="700" fill="#0b6db5">IZQ</text>
+      <text x="6" y="112" font-size="13" font-weight="700" fill="#bd5600">DER</text>
+      <path d="M46 42H130M46 108H130" stroke="#b5c4cc" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    </g>
+    <g id="pod">
+      <path d="M200 88L215 122M230 88L215 122" stroke="#52636e" stroke-width="1.5" fill="none"/>
+      <rect x="192" y="50" width="16" height="38" rx="7" fill="#0b6db5"/>
+      <rect x="222" y="50" width="16" height="38" rx="7" fill="#bd5600"/>
+      <ellipse cx="215" cy="131" rx="8" ry="13" fill="#14222b"/>
+    </g>
+  </defs><rect width="640" height="345" rx="6" fill="#f7fafb"/>
+      <path d="M301.1 24.1A210 210 0 0 1 359.2 151.7" fill="none" stroke="#c4263a" stroke-width="10"/>
+      <path d="M359.2 151.7A210 210 0 0 1 359.2 188.3" fill="none" stroke="#b5c4cc" stroke-width="10"/>
+      <path d="M359.2 188.3A210 210 0 0 1 301.1 315.9" fill="none" stroke="#17805a" stroke-width="10"/>
+      <use href="#remote" class="r" opacity=".3" transform="translate(150 170) rotate(-30) translate(90 0) scale(3)"/>
+      <use href="#remote" class="r" opacity=".3" transform="translate(150 170) rotate(30) translate(90 0) scale(3)"/>
+      <use href="#remote" class="r" transform="translate(150 170) translate(90 0) scale(3)"/>
+      <circle cx="150" cy="170" r="16" fill="none" stroke="#14222b" stroke-width="2"/>
+      <text x="150" y="211" text-anchor="middle" font-size="13" fill="#14222b">Tu mano</text>
+      <text x="319" y="20" font-size="13" font-weight="700" fill="#c4263a">44° atrás: freno máximo</text>
+      <text x="372" y="92" font-size="13" font-weight="700" fill="#c4263a">Punta arriba: frena</text>
+      <text x="376" y="174" font-size="13" font-weight="700" fill="#52636e">±5°: no pasa nada</text>
+      <text x="372" y="256" font-size="13" font-weight="700" fill="#17805a">Punta abajo: empuja</text>
+      <text x="372" y="274" font-size="13" fill="#17805a">30° = 68 % de empuje</text>
+      <text x="319" y="331" font-size="13" font-weight="700" fill="#17805a">44° adelante: empuje máximo</text>
+      <path d="M520 170H612" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="566" y="160" text-anchor="middle" font-size="13" fill="#14222b">Televisor</text>
+    </svg>

@@ -1,5 +1,8 @@
 # Written by config_gui.py.
 
+[mode]
+active = "RACER_TWO"
+
 [stick]
 target = "LEFT"
 center_x = 6
@@ -216,12 +219,13 @@ invert = false
 smoothing = 0.0
 
 [two_wiimotes]
-enabled = false
+enabled = true
 swap = false
-center_left = 0
-center_right = 0
-deadzone = 15
+center_left = -1
+center_right = 12
+deadzone = 8
 max = 70
+steer_range = 1.5
 invert = true
 
 [left_buttons]
@@ -244,11 +248,34 @@ invert_yaw = false
 accel_time = 1.0
 yaw_return = 3.0
 
+[gameplay]
+filter = true
+cutoff = 4.0
+beta = 0.03
+shake_limit = 50
+button_hold = 0.2
+steer_curve = 1.0
+recenter = ""
+
 [mouse]
 enabled = false
 toggle = "BTN_MODE"
+pointer = "WIIMOTE"
+use_motionplus = false
+use_ir = false
 speed = 1000
 curve = 2.0
+aim_speed = 40
+tilt_deadzone = 6
+tilt_max = 40
+cutoff = 1.0
+beta = 0.1
+tighten = 3.0
+click_lock = 0.12
+invert_x = false
+invert_y = false
+ir_invert_x = false
+ir_invert_y = false
 
 [mouse_buttons]
 BTN_SOUTH = "BTN_LEFT"

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 500" width="1160" height="500" role="img" aria-label="Las ocho maniobras con dos Wiimotes"><style>.l{color:#0b6db5}.r{color:#bd5600}text{font-family:sans-serif}</style><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#14222b"/>
+    </marker>
+    <g id="remote">
+      <rect x="-30" y="-6.5" width="60" height="13" rx="4" fill="currentColor"/>
+      <rect x="22" y="-6.5" width="8" height="13" rx="2" fill="#14222b" opacity=".55"/>
+      <path d="M4 6.5q2 5 9 5v-5z" fill="currentColor"/>
+      <circle cx="10" cy="-6.5" r="2" fill="#f7fafb"/>
+    </g>
+    <g id="levers">
+      <text x="6" y="46" font-size="13" font-weight="700" fill="#0b6db5">IZQ</text>
+      <text x="6" y="112" font-size="13" font-weight="700" fill="#bd5600">DER</text>
+      <path d="M46 42H130M46 108H130" stroke="#b5c4cc" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    </g>
+    <g id="pod">
+      <path d="M200 88L215 122M230 88L215 122" stroke="#52636e" stroke-width="1.5" fill="none"/>
+      <rect x="192" y="50" width="16" height="38" rx="7" fill="#0b6db5"/>
+      <rect x="222" y="50" width="16" height="38" rx="7" fill="#bd5600"/>
+      <ellipse cx="215" cy="131" rx="8" ry="13" fill="#14222b"/>
+    </g>
+  </defs><rect width="1160" height="500" rx="6" fill="#f7fafb"/><g transform="translate(0 0)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Reposo</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42)"/>
+        <use href="#remote" class="r" transform="translate(88 108)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">0°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">0°</text>
+        <use href="#pod"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Los dos mandos rectos.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 0 % · Freno 0 % · Giro 0 %</text></g><g transform="translate(290 0)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Acelerar</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(30)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(30)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">30°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">30°</text>
+        <rect x="194" y="88" width="12" height="16" fill="#0b6db5" opacity=".45"/>
+        <rect x="224" y="88" width="12" height="16" fill="#bd5600" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M215 46V22" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Los dos adelante, igual.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 68 % · Freno 0 % · Giro 0 %</text></g><g transform="translate(580 0)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">A tope</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(45)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(45)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">45°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">45°</text>
+        <rect x="194" y="88" width="12" height="24" fill="#0b6db5" opacity=".45"/>
+        <rect x="224" y="88" width="12" height="24" fill="#bd5600" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M215 46V8" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Los dos adelante, 44° o más.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 100 % · Freno 0 % · Giro 0 %</text></g><g transform="translate(870 0)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Frenar</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(-30)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(-30)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">−30°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">−30°</text>
+        <use href="#pod"/>
+        <path d="M190 44H210M220 44H240" stroke="#c4263a" stroke-width="4" fill="none"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Los dos atrás.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 0 % · Freno 68 % · Giro 0 %</text></g><g transform="translate(0 250)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Girar un poco a la izquierda</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(20)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(35)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">20°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">35°</text>
+        <rect x="194" y="88" width="12" height="10" fill="#0b6db5" opacity=".45"/>
+        <rect x="224" y="88" width="12" height="19" fill="#bd5600" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M215 46Q215 24 195 18" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Inclina más la mano derecha.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 80 % · Freno 0 % · Giro 25 % ←</text></g><g transform="translate(290 250)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Girar un poco a la derecha</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(35)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(20)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">35°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">20°</text>
+        <rect x="194" y="88" width="12" height="19" fill="#0b6db5" opacity=".45"/>
+        <rect x="224" y="88" width="12" height="10" fill="#bd5600" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M215 46Q215 24 235 18" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Inclina más la mano izquierda.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 80 % · Freno 0 % · Giro 25 % →</text></g><g transform="translate(580 250)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Giro cerrado a la izquierda</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(-30)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(45)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">−30°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">45°</text>
+        <rect x="224" y="88" width="12" height="24" fill="#bd5600" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M190 44H210" stroke="#c4263a" stroke-width="4" fill="none"/>
+        <path d="M215 46Q215 18 168 24" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Derecha adelante, izquierda atrás.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 32 % · Freno 0 % · Giro 100 % ←</text></g><g transform="translate(870 250)"><rect x="6" y="6" width="278" height="238" rx="6" fill="#fff" stroke="#b5c4cc"/><text x="18" y="32" font-size="15" font-weight="700" fill="#14222b">Giro cerrado a la derecha</text><g transform="translate(5 40)">
+        <use href="#levers"/>
+        <use href="#remote" class="l" transform="translate(88 42) rotate(45)"/>
+        <use href="#remote" class="r" transform="translate(88 108) rotate(-30)"/>
+        <text x="146" y="46" font-size="13" fill="#14222b">45°</text>
+        <text x="146" y="112" font-size="13" fill="#14222b">−30°</text>
+        <rect x="194" y="88" width="12" height="24" fill="#0b6db5" opacity=".45"/>
+        <use href="#pod"/>
+        <path d="M220 44H240" stroke="#c4263a" stroke-width="4" fill="none"/>
+        <path d="M215 46Q215 18 262 24" stroke="#14222b" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      </g><text x="18" y="212" font-size="13" fill="#14222b">Izquierda adelante, derecha atrás.</text><text x="18" y="232" font-size="12" fill="#52636e">Empuje 32 % · Freno 0 % · Giro 100 % →</text></g></svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 250" width="960" height="250" role="img" aria-label="La inclinación de cada Wiimote da el valor de un motor. Los dos motores juntos dan el empuje y el freno. La diferencia entre los motores da el giro. El juego recibe esto como un mando Xbox."><style>.l{color:#0b6db5}.r{color:#bd5600}text{font-family:sans-serif}</style><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#14222b"/>
+    </marker>
+    <g id="remote">
+      <rect x="-30" y="-6.5" width="60" height="13" rx="4" fill="currentColor"/>
+      <rect x="22" y="-6.5" width="8" height="13" rx="2" fill="#14222b" opacity=".55"/>
+      <path d="M4 6.5q2 5 9 5v-5z" fill="currentColor"/>
+      <circle cx="10" cy="-6.5" r="2" fill="#f7fafb"/>
+    </g>
+    <g id="levers">
+      <text x="6" y="46" font-size="13" font-weight="700" fill="#0b6db5">IZQ</text>
+      <text x="6" y="112" font-size="13" font-weight="700" fill="#bd5600">DER</text>
+      <path d="M46 42H130M46 108H130" stroke="#b5c4cc" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    </g>
+    <g id="pod">
+      <path d="M200 88L215 122M230 88L215 122" stroke="#52636e" stroke-width="1.5" fill="none"/>
+      <rect x="192" y="50" width="16" height="38" rx="7" fill="#0b6db5"/>
+      <rect x="222" y="50" width="16" height="38" rx="7" fill="#bd5600"/>
+      <ellipse cx="215" cy="131" rx="8" ry="13" fill="#14222b"/>
+    </g>
+  </defs><rect width="960" height="250" rx="6" fill="#f7fafb"/>
+      <g font-size="13" fill="#14222b">
+        <rect x="10" y="40" width="150" height="60" rx="5" fill="none" stroke="#0b6db5" stroke-width="2"/>
+        <text x="85" y="66" text-anchor="middle" font-weight="700" fill="#0b6db5">Wiimote izquierdo</text>
+        <text x="85" y="86" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12">00:5A:1B:00:17:92</text>
+        <rect x="10" y="150" width="150" height="60" rx="5" fill="none" stroke="#bd5600" stroke-width="2"/>
+        <text x="85" y="176" text-anchor="middle" font-weight="700" fill="#bd5600">Wiimote derecho</text>
+        <text x="85" y="196" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12">00:1A:E9:5F:FC:D8</text>
+
+        <path d="M160 70H286" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M160 180H286" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="223" y="60" text-anchor="middle">inclinación</text>
+        <text x="223" y="170" text-anchor="middle">inclinación</text>
+
+        <rect x="290" y="40" width="130" height="60" rx="5" fill="#0b6db5" opacity=".14"/>
+        <text x="355" y="66" text-anchor="middle" font-weight="700">Motor izquierdo</text>
+        <text x="355" y="86" text-anchor="middle">−100 … +100 %</text>
+        <rect x="290" y="150" width="130" height="60" rx="5" fill="#bd5600" opacity=".14"/>
+        <text x="355" y="176" text-anchor="middle" font-weight="700">Motor derecho</text>
+        <text x="355" y="196" text-anchor="middle">−100 … +100 %</text>
+
+        <path d="M420 62H556" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M420 188H556" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M420 80L556 170" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M420 170L556 80" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="560" y="40" width="170" height="60" rx="5" fill="none" stroke="#17805a" stroke-width="2"/>
+        <text x="645" y="66" text-anchor="middle" font-weight="700" fill="#17805a">Empuje</text>
+        <text x="645" y="86" text-anchor="middle">gana el motor mayor</text>
+        <rect x="560" y="150" width="170" height="60" rx="5" fill="none" stroke="#14222b" stroke-width="2"/>
+        <text x="645" y="176" text-anchor="middle" font-weight="700">Giro</text>
+        <text x="645" y="196" text-anchor="middle">(izq − der) ÷ 1,5</text>
+
+        <path d="M730 70H816" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M730 180H816" stroke="#14222b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="772" y="60" text-anchor="middle">RT / LT</text>
+        <text x="772" y="170" text-anchor="middle">stick izq ↔</text>
+
+        <rect x="820" y="40" width="130" height="170" rx="5" fill="#14222b" opacity=".08"/>
+        <text x="885" y="118" text-anchor="middle" font-weight="700">Galactic Racer</text>
+        <text x="885" y="138" text-anchor="middle">ve un mando Xbox</text>
+      </g>
+    </svg>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 430" width="420" height="430" role="img" aria-label="Wiimote derecho. Cruceta da cruceta, gatillo B da empuje a tope, A da A o turbo, Home cambia al modo ratón, más da Start, menos da Back, 1 da RB, 2 da Y y agitar da X."><style>.l{color:#0b6db5}.r{color:#bd5600}text{font-family:sans-serif}</style><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#14222b"/>
+    </marker>
+    <g id="remote">
+      <rect x="-30" y="-6.5" width="60" height="13" rx="4" fill="currentColor"/>
+      <rect x="22" y="-6.5" width="8" height="13" rx="2" fill="#14222b" opacity=".55"/>
+      <path d="M4 6.5q2 5 9 5v-5z" fill="currentColor"/>
+      <circle cx="10" cy="-6.5" r="2" fill="#f7fafb"/>
+    </g>
+    <g id="levers">
+      <text x="6" y="46" font-size="13" font-weight="700" fill="#0b6db5">IZQ</text>
+      <text x="6" y="112" font-size="13" font-weight="700" fill="#bd5600">DER</text>
+      <path d="M46 42H130M46 108H130" stroke="#b5c4cc" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    </g>
+    <g id="pod">
+      <path d="M200 88L215 122M230 88L215 122" stroke="#52636e" stroke-width="1.5" fill="none"/>
+      <rect x="192" y="50" width="16" height="38" rx="7" fill="#0b6db5"/>
+      <rect x="222" y="50" width="16" height="38" rx="7" fill="#bd5600"/>
+      <ellipse cx="215" cy="131" rx="8" ry="13" fill="#14222b"/>
+    </g>
+  </defs><rect width="420" height="430" rx="6" fill="#f7fafb"/>
+        <rect x="40" y="10" width="80" height="400" rx="20" fill="none" stroke="#bd5600" stroke-width="2.5"/>
+        <g fill="none" stroke="#14222b" stroke-width="1.5">
+          <path d="M72 67h16v14h14v16h-14v14h-16v-14h-14v-16h14z"/>
+          <circle cx="80" cy="165" r="17"/>
+          <circle cx="80" cy="125" r="11" stroke-dasharray="3 3"/>
+          <circle cx="58" cy="240" r="8"/><circle cx="80" cy="240" r="8"/><circle cx="102" cy="240" r="8"/>
+          <circle cx="80" cy="310" r="13"/><circle cx="80" cy="355" r="13"/>
+        </g>
+        <g font-size="12" text-anchor="middle" fill="#14222b">
+          <text x="80" y="170" font-weight="700">A</text><text x="80" y="129">B</text>
+          <text x="58" y="244">−</text><text x="80" y="244">⌂</text><text x="102" y="244">+</text>
+          <text x="80" y="315" font-weight="700">1</text><text x="80" y="360" font-weight="700">2</text>
+        </g>
+        <g fill="none" stroke="#52636e" stroke-width="1">
+          <path d="M102 89H150M91 125H150M97 165H150"/>
+          <path d="M80 232V218H150M110 240H150M58 248V264H150"/>
+          <path d="M93 310H150M93 355H150"/>
+        </g>
+        <g font-size="13" fill="#14222b">
+          <text x="156" y="93">Cruceta → Cruceta</text>
+          <text x="156" y="129">Gatillo B, detrás → <tspan font-weight="700">RT, empuje a tope</tspan></text>
+          <text x="156" y="169">A → <tspan font-weight="700">A, turbo*</tspan></text>
+          <text x="156" y="222" fill="#c4263a" font-weight="700">Home → modo ratón</text>
+          <text x="156" y="244">+ → Start</text>
+          <text x="156" y="268">− → Back</text>
+          <text x="156" y="314">1 → RB</text>
+          <text x="156" y="359">2 → Y</text>
+          <text x="156" y="398">Agitar fuerte → <tspan font-weight="700">X, derrape*</tspan></text>
+        </g>
+      </svg>

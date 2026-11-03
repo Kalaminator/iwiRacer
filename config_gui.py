@@ -10,12 +10,12 @@ import tomllib
 from evdev import ecodes as e, ff
 from PySide6.QtCore import QPointF, QRectF, QSocketNotifier, Qt, QTimer
 from PySide6.QtGui import QPainter, QPalette
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout, QHBoxLayout,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox, QHBoxLayout,
                                QLabel, QMessageBox, QProgressBar, QPushButton, QSpinBox, QTabWidget,
                                QVBoxLayout, QWidget)
 
-from wiimote2xbox import (ACCEL, CONFIG, ENGINES, IR, MONITOR, MONITORED, MOTION_SOURCES, MPLUS, NUNCHUK, RAW, WIIMOTE,
-                          WIIMOTE2, Imu, abs_values, find, motion_raw, remotes)
+from wiimote2xbox import (ACCEL, CONFIG, ENGINES, GAMEPLAY_DEFAULT, IR, MONITOR, MONITORED, MOTION_SOURCES, MOUSE_DEFAULT,
+                          MPLUS, NUNCHUK, RAW, WIIMOTE, WIIMOTE2, Imu, abs_values, find, motion_raw, remotes)
 
 PAD = "Microsoft X-Box 360 pad"
 SERVICE = "wiimote2xbox.service"
@@ -49,21 +49,26 @@ MOTION_LABELS = {"WIIMOTE_X": "Wiimote: girar (eje X)", "WIIMOTE_Y": "Wiimote: i
                  "WIIMOTE_YAW": "MotionPlus: apuntar izquierda/derecha (grados, vuelve a 0)",
                  "GYRO_PITCH": "MotionPlus: golpe adelante/atrás (grados/s)", "GYRO_ROLL": "MotionPlus: golpe de muñeca (grados/s)",
                  "GYRO_YAW": "MotionPlus: golpe izquierda/derecha (grados/s)"}
-MOTION_TABS = {"WIIMOTE_X": "Wii girar", "WIIMOTE_Y": "Wii inclinar", "WIIMOTE_Z": "Wii Z", "WIIMOTE_SHAKE": "Wii agitar",
-               "NUNCHUK_X": "Nun girar", "NUNCHUK_Y": "Nun inclinar", "NUNCHUK_Z": "Nun Z", "NUNCHUK_SHAKE": "Nun agitar",
-               "IR_X": "IR ↔", "IR_Y": "IR ↕", "IR_DIST": "IR distancia",
-               "WIIMOTE_PITCH": "M+ inclinar", "WIIMOTE_ROLL": "M+ girar", "WIIMOTE_YAW": "M+ apuntar",
-               "GYRO_PITCH": "M+ golpe ↕", "GYRO_ROLL": "M+ golpe giro", "GYRO_YAW": "M+ golpe ↔"}
+MOTION_TABS = {"Wiimote": {"WIIMOTE_X": "Girar", "WIIMOTE_Y": "Inclinar", "WIIMOTE_Z": "Eje Z", "WIIMOTE_SHAKE": "Agitar"},
+               "Nunchuk": {"NUNCHUK_X": "Girar", "NUNCHUK_Y": "Inclinar", "NUNCHUK_Z": "Eje Z", "NUNCHUK_SHAKE": "Agitar"},
+               "Barra IR": {"IR_X": "Apuntar ↔", "IR_Y": "Apuntar ↕", "IR_DIST": "Distancia"},
+               "MotionPlus": {"WIIMOTE_PITCH": "Inclinar", "WIIMOTE_ROLL": "Girar", "WIIMOTE_YAW": "Apuntar",
+                              "GYRO_PITCH": "Golpe ↕", "GYRO_ROLL": "Golpe de muñeca", "GYRO_YAW": "Golpe ↔"}}
 MOTION_TARGETS = [("ABS_X", "Stick izquierdo ↔ (dirección)"), ("ABS_Y", "Stick izquierdo ↕"),
                   ("ABS_RX", "Stick derecho ↔"), ("ABS_RY", "Stick derecho ↕"),
                   ("ABS_Z", "LT"), ("ABS_RZ", "RT"),
                   ("POD_LEFT", "Podracer: motor izquierdo"), ("POD_RIGHT", "Podracer: motor derecho")] + [(k, f"Botón {v}") for k, v in PAD_BUTTONS]
 MOTION_DEFAULT = {"enabled": False, "source": "WIIMOTE_X", "target": "ABS_X", "center": 0,
                   "deadzone": 10, "max": 100, "anti_deadzone": 0, "invert": False, "smoothing": 0.7}
-MOTION_SLOTS = len(MOTION_LABELS)
 ANTI_LABEL = "Empuje inicial % (anti-zona muerta)"
-MOUSE_DEFAULT = {"enabled": False, "toggle": "BTN_MODE", "speed": 1000, "curve": 2.0}
-TWO_DEFAULT = {"enabled": False, "swap": False, "center_left": 0, "center_right": 0, "deadzone": 15, "max": 70, "invert": True}
+POINTERS = [("WIIMOTE", "Wiimote (apuntar con el mando)"), ("STICK", "Stick del Nunchuk")]
+MODES = [("RACER", "Galactic Racer: Wiimote + Nunchuk"), ("RACER_TWO", "Galactic Racer: dos Wiimotes como palancas"),
+         ("MOUSE", "Ratón: puntero"), ("DOLPHIN", "Dolphin: Wiimote libre")]
+MODE_HELP = {"RACER": "El juego ve un mando Xbox. Home cambia a ratón.",
+             "RACER_TWO": "Conecta dos Wiimotes sin Nunchuk. Cada uno es una palanca. El juego ve un mando Xbox.",
+             "MOUSE": "El Wiimote mueve el puntero. Home cambia a mando.",
+             "DOLPHIN": "El programa suelta los Wiimotes para Dolphin. Cierra esta ventana antes de abrir Dolphin."}
+TWO_DEFAULT = {"enabled": False, "swap": False, "center_left": 0, "center_right": 0, "deadzone": 15, "max": 70, "invert": True, "steer_range": 1.5}
 MPLUS_DEFAULT = {"invert_pitch": False, "invert_roll": False, "invert_yaw": False, "accel_time": 1.0, "yaw_return": 3.0}
 
 
@@ -124,6 +129,15 @@ def form_page():
     page, form = QWidget(), QFormLayout()
     page.setLayout(form)
     return page, form
+
+
+def group(title, *rows):
+    """A titled box. A row is one widget, or a (label, widget) pair."""
+    box, form = QGroupBox(title), QFormLayout()
+    box.setLayout(form)
+    for row in rows:
+        form.addRow(*row) if isinstance(row, tuple) else form.addRow(row)
+    return box
 
 
 class Reader:
@@ -228,13 +242,21 @@ class Window(QWidget):
         tabs = QTabWidget()
         tabs.addTab(self.buttons_tab(cfg["buttons"]), "Botones")
         tabs.addTab(self.stick_tab(cfg["stick"]), "Stick")
-        motions = cfg.get("motion", [])
-        tabs.addTab(self.motion_tab([MOTION_DEFAULT | (motions[i] if i < len(motions) else {})
-                                     for i in range(MOTION_SLOTS)]), "Movimiento")
-        tabs.addTab(self.two_tab(TWO_DEFAULT | cfg.get("two_wiimotes", {}), cfg.get("left_buttons", {})), "Dos Wiimotes")
-        tabs.addTab(self.mplus_tab(MPLUS_DEFAULT | cfg.get("motionplus", {})), "MotionPlus")
-        tabs.addTab(self.mouse_tab(MOUSE_DEFAULT | cfg.get("mouse", {}), cfg.get("mouse_buttons", {})), "Ratón")
+        tabs.addTab(self.motion_tab(cfg.get("motion", [])), "Movimiento")
+        tabs.addTab(self.play_tab(GAMEPLAY_DEFAULT | cfg.get("gameplay", {})), "Juego")
         tabs.addTab(self.rumble_tab(cfg["rumble"]), "Vibración")
+        tabs.addTab(self.two_tab(TWO_DEFAULT | cfg.get("two_wiimotes", {}), cfg.get("left_buttons", {})), "Dos Wiimotes")
+        tabs.addTab(self.mouse_tab(MOUSE_DEFAULT | cfg.get("mouse", {}), cfg.get("mouse_buttons", {})), "Ratón")
+        tabs.addTab(self.mplus_tab(MPLUS_DEFAULT | cfg.get("motionplus", {})), "MotionPlus")
+
+        self.mode = combo(MODES, cfg.get("mode", {}).get("active", "RACER"))
+        self.mode_help = QLabel(MODE_HELP[self.mode.currentData()])
+        self.mode.activated.connect(self.choose_mode)
+        modes = QHBoxLayout()
+        modes.addWidget(QLabel("Modo:"))
+        modes.addWidget(self.mode)
+        modes.addWidget(self.mode_help)
+        modes.addStretch()
 
         self.view = PadView()
         self.pad = Reader(PAD, self.view.event_in, self)
@@ -270,6 +292,7 @@ class Window(QWidget):
         bottom.addStretch()
         bottom.addWidget(save)
         root = QVBoxLayout(self)
+        root.addLayout(modes)
         root.addLayout(top)
         root.addLayout(bottom)
 
@@ -284,7 +307,8 @@ class Window(QWidget):
 
     def buttons_tab(self, buttons):
         page, form = form_page()
-        form.addRow(QLabel("Pulsa un botón del Wiimote: su fila se ilumina."))
+        form.addRow(QLabel("Pulsa un botón del Wiimote: su fila se ilumina.\n"
+                           "El botón para recentrar (pestaña Juego) y el de cambiar a ratón (pestaña Ratón) ignoran esta lista."))
         self.button_boxes = self.mapping(form, TARGETS, buttons)
         return page
 
@@ -307,41 +331,86 @@ class Window(QWidget):
         form.addRow(QLabel("El recorrido máximo crece solo si el stick llega más lejos."))
         return page
 
-    def motion_tab(self, slots):
+    def motion_tab(self, motions):
         page = QWidget()
         lay = QVBoxLayout(page)
         lay.addWidget(QLabel("Convierte el movimiento en stick o botones del mando.\n"
-                             "Cada número es un movimiento. Mueve el mando y mira la barra."))
-        sub = QTabWidget()
-        lay.addWidget(sub)
+                             "Elige el mando y el movimiento. ✓ = activado. Mueve el mando y mira la barra."))
+        self.motion_groups = QTabWidget()
+        lay.addWidget(self.motion_groups)
+        # ponytail: one output per motion. For two outputs from one motion, make the slots a list per source.
+        saved = {m["source"]: m for m in reversed(motions)}
         self.motions = []
-        for i, m in enumerate(slots):
-            p, form = form_page()
-            w = {"enabled": check(m["enabled"], "Activado"),
-                 "source": combo(MOTION_LABELS.items(), m["source"]), "target": combo(MOTION_TARGETS, m["target"]),
-                 "center": spin(m["center"], -1023, 1023), "deadzone": spin(m["deadzone"], 0, 500),
-                 "max": spin(m["max"], 1, 1023), "anti_deadzone": spin(m["anti_deadzone"], 0, 90),
-                 "invert": check(m["invert"]),
-                 "smoothing": dspin(m["smoothing"], 0, 0.95, 0.05)}
-            form.addRow(w["enabled"])
-            for key, label in (("source", "Movimiento"), ("target", "Controla"), ("center", "Centro"),
-                               ("deadzone", "Zona muerta"), ("max", "Recorrido máximo"),
-                               ("anti_deadzone", ANTI_LABEL), ("invert", "Invertir"), ("smoothing", "Suavizado (0 = nada)")):
-                form.addRow(label, w[key])
-            w["raw"] = QLabel("—")
-            w["bar"] = QProgressBar()
-            w["bar"].setRange(-100, 100)
-            w["bar"].setFormat("%v %")
-            center = QPushButton("Usar la posición actual como centro")
-            center.clicked.connect(lambda _=False, w=w: self.center_motion(w))
-            form.addRow("Valor en bruto", w["raw"])
-            form.addRow("Salida", w["bar"])
-            form.addRow(center)
-            self.motions.append(w)
-            sub.addTab(p, MOTION_TABS[m["source"]])
-            w["source"].currentIndexChanged.connect(
-                lambda _=0, i=i, w=w: sub.setTabText(i, MOTION_TABS[w["source"].currentData()]))
-        lay.addWidget(QLabel("Puntero IR: necesita la barra de sensores encendida y el Wiimote apuntando a ella."))
+        for title, names in MOTION_TABS.items():
+            sub = QTabWidget()
+            self.motion_groups.addTab(sub, title)
+            for source, name in names.items():
+                m = MOTION_DEFAULT | saved.get(source, {}) | {"source": source}
+                p, form = form_page()
+                w = {"enabled": check(m["enabled"], "Activado"),
+                     "source": combo(MOTION_LABELS.items(), source), "target": combo(MOTION_TARGETS, m["target"]),
+                     "center": spin(m["center"], -1023, 1023), "deadzone": spin(m["deadzone"], 0, 500),
+                     "max": spin(m["max"], 1, 1023), "anti_deadzone": spin(m["anti_deadzone"], 0, 90),
+                     "invert": check(m["invert"]),
+                     "smoothing": dspin(m["smoothing"], 0, 0.95, 0.05)}
+                w["source"].setEnabled(False)
+                w["enabled"].toggled.connect(self.mark_motions)
+                if title == "Barra IR":
+                    form.addRow(QLabel("Necesita la barra de sensores encendida y el Wiimote apuntando a ella."))
+                form.addRow(w["enabled"])
+                for key, label in (("source", "Movimiento"), ("target", "Controla"), ("center", "Centro"),
+                                   ("deadzone", "Zona muerta"), ("max", "Recorrido máximo"),
+                                   ("anti_deadzone", ANTI_LABEL), ("invert", "Invertir"),
+                                   ("smoothing", "Suavizado (0 = nada; con el filtro 1 €, solo cuenta el 0)")):
+                    form.addRow(label, w[key])
+                w["raw"] = QLabel("—")
+                w["bar"] = QProgressBar()
+                w["bar"].setRange(-100, 100)
+                w["bar"].setFormat("%v %")
+                center = QPushButton("Usar la posición actual como centro")
+                center.clicked.connect(lambda _=False, w=w: self.center_motion(w))
+                form.addRow("Valor en bruto", w["raw"])
+                form.addRow("Salida", w["bar"])
+                form.addRow(center)
+                self.motions.append(w)
+                sub.addTab(p, name)
+        self.mark_motions()
+        return page
+
+    def mark_motions(self):
+        """A check mark on the tabs of the motions that are on, so they are easy to find."""
+        slots = iter(self.motions)
+        for g, (title, names) in enumerate(MOTION_TABS.items()):
+            sub, some = self.motion_groups.widget(g), False
+            for i, name in enumerate(names.values()):
+                on = next(slots)["enabled"].isChecked()
+                sub.setTabText(i, f"✓ {name}" if on else name)
+                some |= on
+            self.motion_groups.setTabText(g, f"✓ {title}" if some else title)
+
+    def play_tab(self, g):
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        self.play = {"filter": check(g["filter"], "Activado (filtro 1 €)"),
+                     "cutoff": dspin(g["cutoff"], 0.1, 10, 0.1), "beta": dspin(g["beta"], 0, 2, 0.01),
+                     "shake_limit": spin(g["shake_limit"], 0, 200), "button_hold": dspin(g["button_hold"], 0, 1, 0.05),
+                     "steer_curve": dspin(g["steer_curve"], 1, 3, 0.1), "recenter": combo(NOTHING + SOURCES, g["recenter"])}
+        p = self.play
+        lay.addWidget(QLabel("Mejoras para jugar. Apaga una, pulsa «Guardar y aplicar» y compara."))
+        lay.addWidget(group("Dirección",
+                            ("Curva de dirección (1 = lineal)", p["steer_curve"]),
+                            ("Botón para recentrar la inclinación", p["recenter"]),
+                            QLabel("Este botón deja de hacer su función de la pestaña Botones.\n"
+                                   "Con dos Wiimotes, solo recentra el derecho.\n"
+                                   "El centro nuevo dura hasta guardar o reiniciar.")))
+        lay.addWidget(group("Estabilizar la inclinación",
+                            p["filter"],
+                            ("Suavizado en lento (Hz, menos = más estable)", p["cutoff"]),
+                            ("Reacción en rápido (más = menos retraso)", p["beta"])))
+        lay.addWidget(group("Agitar",
+                            ("Ignorar la inclinación al agitar, desde % de 1 g (0 = apagado)", p["shake_limit"]),
+                            ("Botón por agitar: tiempo pulsado (s, 0 = apagado)", p["button_hold"])))
+        lay.addStretch()
         return page
 
     def two_tab(self, t, left_buttons):
@@ -355,6 +424,7 @@ class Window(QWidget):
                     "swap": check(t["swap"], "Intercambiar izquierda y derecha"),
                     "center_left": spin(t["center_left"], -100, 100), "center_right": spin(t["center_right"], -100, 100),
                     "deadzone": spin(t["deadzone"], 0, 60), "max": spin(t["max"], 10, 120),
+                    "steer_range": dspin(t["steer_range"], 1, 3, 0.1),
                     "invert": check(t["invert"], "Invertir adelante/atrás")}
         self.two_count = QLabel()
         self.lever_bars = [QProgressBar(), QProgressBar()]
@@ -375,7 +445,8 @@ class Window(QWidget):
         form.addRow(self.two["swap"])
         form.addRow(center)
         for key, label in (("center_left", "Centro izquierda"), ("center_right", "Centro derecha"),
-                           ("deadzone", "Zona muerta"), ("max", "Recorrido máximo")):
+                           ("deadzone", "Zona muerta"), ("max", "Recorrido máximo"),
+                           ("steer_range", "Recorrido del giro (más = más fino)")):
             form.addRow(label, self.two[key])
         form.addRow(self.two["invert"])
         return page
@@ -400,16 +471,51 @@ class Window(QWidget):
         return page
 
     def mouse_tab(self, m, buttons):
-        page, form = form_page()
+        page, left, right = QWidget(), QVBoxLayout(), QVBoxLayout()
+        row = QHBoxLayout(page)
+        row.addLayout(left)
+        row.addLayout(right)
         self.mouse = {"enabled": check(m["enabled"], "Usar el Wiimote como ratón (en vez de mando)"),
                       "toggle": combo(NOTHING + SOURCES, m["toggle"]),
-                      "speed": spin(m["speed"], 100, 5000), "curve": dspin(m["curve"], 1, 3, 0.1)}
-        form.addRow(self.mouse["enabled"])
-        form.addRow("Botón para cambiar mando ↔ ratón", self.mouse["toggle"])
-        form.addRow("Velocidad (píxeles/s)", self.mouse["speed"])
-        form.addRow("Curva (1 = lineal)", self.mouse["curve"])
-        form.addRow(QLabel("El stick del Nunchuk mueve el puntero. Botones en modo ratón:"))
-        self.mouse_boxes = self.mapping(form, MOUSE_TARGETS, buttons)
+                      "pointer": combo(POINTERS, m["pointer"]),
+                      "use_motionplus": check(m["use_motionplus"], "Mejorar con MotionPlus (el mando mueve el puntero al girarlo)"),
+                      "use_ir": check(m["use_ir"], "Usar la barra de sensores (puntero IR)"),
+                      "speed": spin(m["speed"], 100, 5000), "curve": dspin(m["curve"], 1, 3, 0.1),
+                      "aim_speed": spin(m["aim_speed"], 5, 300),
+                      "tilt_deadzone": spin(m["tilt_deadzone"], 0, 14), "tilt_max": spin(m["tilt_max"], 15, 90),
+                      "cutoff": dspin(m["cutoff"], 0.1, 10, 0.1), "beta": dspin(m["beta"], 0, 2, 0.01),
+                      "tighten": dspin(m["tighten"], 0, 20, 0.5), "click_lock": dspin(m["click_lock"], 0, 0.5, 0.01),
+                      "invert_x": check(m["invert_x"], "Invertir izquierda/derecha"),
+                      "invert_y": check(m["invert_y"], "Invertir arriba/abajo"),
+                      "ir_invert_x": check(m["ir_invert_x"], "IR: invertir izquierda/derecha"),
+                      "ir_invert_y": check(m["ir_invert_y"], "IR: invertir arriba/abajo")}
+        p = self.mouse
+        left.addWidget(group("Puntero",
+                             p["enabled"],
+                             ("Botón para cambiar mando ↔ ratón", p["toggle"]),
+                             ("El puntero se mueve con", p["pointer"])))
+        left.addWidget(group("Sensores del Wiimote",
+                             QLabel("Sin MotionPlus ni barra: inclínalo para mover el puntero.\n"
+                                    "La posición al entrar en modo ratón es el centro."),
+                             p["use_motionplus"],
+                             p["use_ir"]))
+        left.addWidget(group("Velocidad",
+                             ("Stick e inclinación: píxeles/s", p["speed"]),
+                             ("Stick e inclinación: curva (1 = lineal)", p["curve"]),
+                             ("MotionPlus / IR: píxeles por grado", p["aim_speed"]),
+                             ("Inclinación: zona muerta (grados)", p["tilt_deadzone"]),
+                             ("Inclinación: máximo (grados)", p["tilt_max"])))
+        left.addWidget(group("Estabilizador",
+                             ("Suavizado en lento (Hz, menos = más estable)", p["cutoff"]),
+                             ("Reacción en rápido (más = menos retraso)", p["beta"]),
+                             ("Anti-temblor (grados/s, 0 = nada)", p["tighten"]),
+                             ("Parar el puntero al hacer clic (s)", p["click_lock"])))
+        left.addStretch()
+        keys = group("Botones en modo ratón")
+        self.mouse_boxes = self.mapping(keys.layout(), MOUSE_TARGETS, buttons)
+        right.addWidget(keys)
+        right.addWidget(group("Invertir", p["invert_x"], p["invert_y"], p["ir_invert_x"], p["ir_invert_y"]))
+        right.addStretch()
         return page
 
     def rumble_tab(self, r):
@@ -464,7 +570,8 @@ class Window(QWidget):
             v = raw - w["center"].value()
             a = max(0, abs(v) - w["deadzone"].value()) / max(1, w["max"].value() - w["deadzone"].value())
             anti = w["anti_deadzone"].value() if a > 0 else 0
-            pct = round(anti + min(1, a) * (100 - anti)) * (-1 if (v < 0) != w["invert"].isChecked() else 1)
+            curve = self.play["steer_curve"].value() if w["target"].currentData() == "ABS_X" else 1
+            pct = round(anti + min(1, a) ** curve * (100 - anti)) * (-1 if (v < 0) != w["invert"].isChecked() else 1)
             w["bar"].setValue(pct)
 
     def center_stick(self):
@@ -493,14 +600,32 @@ class Window(QWidget):
         self.status.setText("Daemon: en marcha" if running else f"Daemon: parado ({state})")
         self.two_count.setText(f"Wiimotes conectados: {len(remotes())} de 2")
 
+    def choose_mode(self):
+        """A mode is a set of the options in the tabs; it applies at once. The other settings stay as they are."""
+        mode = self.mode.currentData()
+        self.mouse["enabled"].setChecked(mode == "MOUSE")
+        self.two["enabled"].setChecked(mode == "RACER_TWO")
+        self.save()
+
+    def current_mode(self):
+        """The mode the options really give, so the list stays true after a change by hand in a tab."""
+        if self.mode.currentData() == "DOLPHIN":
+            return "DOLPHIN"
+        return "MOUSE" if self.mouse["enabled"].isChecked() else "RACER_TWO" if self.two["enabled"].isChecked() else "RACER"
+
     def save(self):
-        cfg = {"stick": {k: value(w) for k, w in self.stick.items()},
+        mode = self.current_mode()
+        self.mode.setCurrentIndex(self.mode.findData(mode))
+        self.mode_help.setText(MODE_HELP[mode])
+        cfg = {"mode": {"active": mode},
+               "stick": {k: value(w) for k, w in self.stick.items()},
                "buttons": {k: value(w) for k, w in self.button_boxes.items()},
                "rumble": {"enabled": self.rumble.isChecked()},
                "motion": [{k: value(w[k]) for k in MOTION_DEFAULT} for w in self.motions],
                "two_wiimotes": {k: value(w) for k, w in self.two.items()},
                "left_buttons": {k: value(w) for k, w in self.left_boxes.items()},
                "motionplus": {k: value(w) for k, w in self.mplus.items()},
+               "gameplay": {k: value(w) for k, w in self.play.items()},
                "mouse": {k: value(w) for k, w in self.mouse.items()},
                "mouse_buttons": {k: value(w) for k, w in self.mouse_boxes.items()}}
         self.imu.config(cfg["motionplus"])
