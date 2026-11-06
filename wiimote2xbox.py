@@ -10,11 +10,14 @@ import signal
 import socket
 import struct
 import sys
+import threading
 import time
 import tomllib
 from pathlib import Path
 
 from evdev import AbsInfo, InputDevice, UInput, ecodes as e, ff, list_devices
+
+import rawmplus
 
 WIIMOTE = "Nintendo Wii Remote"
 NUNCHUK = "Nintendo Wii Remote Nunchuk"
@@ -22,7 +25,7 @@ ACCEL = "Nintendo Wii Remote Accelerometer"
 IR = "Nintendo Wii Remote IR"
 MPLUS = "Nintendo Wii Remote Motion Plus"
 SECOND = " #2"  # marks the second remote's devices; both remotes use the same device names
-WIIMOTE2, ACCEL2 = WIIMOTE + SECOND, ACCEL + SECOND
+WIIMOTE2, ACCEL2, MPLUS2 = WIIMOTE + SECOND, ACCEL + SECOND, MPLUS + SECOND
 MONITORED = (WIIMOTE, NUNCHUK, WIIMOTE2)  # devices whose raw events go to the GUI
 ENGINES = 255  # MONITOR device number for lever values: code 0/1 = left/right output %, code 2/3 = left/right raw
 LEVER_SMOOTHING = 0.6
@@ -54,7 +57,9 @@ MOTION_SOURCES = {"WIIMOTE_X": (ACCEL, e.ABS_RX), "WIIMOTE_Y": (ACCEL, e.ABS_RY)
                   "NUNCHUK_SHAKE": (NUNCHUK, "SHAKE"),
                   "IR_X": (IR, "IR_X"), "IR_Y": (IR, "IR_Y"), "IR_DIST": (IR, "IR_DIST"),
                   "WIIMOTE_PITCH": (MPLUS, "PITCH"), "WIIMOTE_ROLL": (MPLUS, "ROLL"), "WIIMOTE_YAW": (MPLUS, "YAW"),
-                  "GYRO_PITCH": (MPLUS, "RATE_PITCH"), "GYRO_ROLL": (MPLUS, "RATE_ROLL"), "GYRO_YAW": (MPLUS, "RATE_YAW")}
+                  "GYRO_PITCH": (MPLUS, "RATE_PITCH"), "GYRO_ROLL": (MPLUS, "RATE_ROLL"), "GYRO_YAW": (MPLUS, "RATE_YAW"),
+                  # levers only: forward tilt from the gyro, in the accelerometer's units, so lever settings keep their meaning
+                  "WIIMOTE_LEVER": (MPLUS, "LEVER"), "WIIMOTE2_LEVER": (MPLUS2, "LEVER")}
 MOTION_AXES = ("ABS_X", "ABS_Y", "ABS_RX", "ABS_RY", "ABS_Z", "ABS_RZ")
 POD = ("POD_LEFT", "POD_RIGHT")  # podracer engines: tilt each controller forward like a thrust lever
 MOUSE_DEFAULT = {"enabled": False, "toggle": "BTN_MODE", "speed": 1000, "curve": 2.0, "pointer": "WIIMOTE",
@@ -148,6 +153,7 @@ class Imu:
         self.bias = None    # gyro at rest as (pitch, roll, yaw); unknown until the first still moment
         self.up = None      # gravity direction in Wiimote axes (x, y = nose, z = top), length 1
         self.yaw = 0.0
+        self.gravity = GRAVITY  # this remote's accelerometer length at rest; some read 125, not 100
         self.last = None
         self.window = []
         self.window_start = 0
@@ -167,8 +173,9 @@ class Imu:
             # ponytail: a perfectly steady flat turn still looks like rest; the next still moment fixes it.
             if (len(self.window) >= 10 and all(max(c) - min(c) < STILL_RANGE for c in gyro)
                     and all(max(c) - min(c) < STILL_ACCEL for c in accel)
-                    and abs(math.hypot(*(c[-1] for c in accel)) - GRAVITY) < 25):
+                    and 0.7 < math.hypot(*(c[-1] for c in accel)) / GRAVITY < 1.4):
                 self.bias = [sum(c) / len(c) for c in gyro]
+                self.gravity = math.hypot(*(sum(c) / len(c) for c in accel))
             self.window = []
 
     def update(self, gyro, accel, now):
@@ -186,7 +193,7 @@ class Imu:
         p, r, w = [s * (v - b) / GYRO_UNITS for s, v, b in zip(self.signs, raw, self.bias)] if self.bias else (0, 0, 0)
         k = math.radians(dt)
         x, y, z = x + (r * z - w * y) * k, y + (p * z + w * x) * k, z - (r * x + p * y) * k
-        if abs(n - GRAVITY) < 25:
+        if abs(n - self.gravity) < 25:
             lean = dt / self.accel_time
             x, y, z = x + (a[0] / n - x) * lean, y + (a[1] / n - y) * lean, z + (a[2] / n - z) * lean
         length = math.hypot(x, y, z)
@@ -194,6 +201,7 @@ class Imu:
         x, y, z = self.up
         gyro["PITCH"] = math.degrees(math.atan2(y, math.hypot(x, z)))
         gyro["ROLL"] = math.degrees(math.atan2(x, z))
+        gyro["LEVER"] = y * self.gravity  # what WIIMOTE_Y would read, without shake noise
         if self.bias:
             self.yaw += ((w * z + r * y - p * x) - self.yaw / self.yaw_return) * dt
             # AIM: turn rates as the screen sees them (+ = right, up), so a Wiimote held at an angle still aims true.
@@ -404,7 +412,9 @@ class Bridge:
         self.wm_effects = {}  # remote -> its rumble effect id
         self.order = []     # connected remotes: first = WIIMOTE (right lever), second = WIIMOTE2 (left lever)
         self.buzzing = False
-        self.imu = Imu()    # outlives reloads, so the gyro rest value stays known
+        self.imus = {MPLUS: Imu(), MPLUS2: Imu()}  # outlive reloads, so the gyro rest value stays known
+        self.imu = self.imus[MPLUS]
+        self.mp_remotes = set()  # remotes that have a MotionPlus device
         self.aim = Aim()
         self.next_scan = 0
         self.monitor = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
@@ -430,8 +440,9 @@ class Bridge:
         self.shaken = {}  # device -> time until its tilt counts again
         self.build_motions()
         # latest ABS values of motion devices; read again from open ones, because a still device sends nothing
-        self.state = {n: abs_values(self.devs[n]) if n in self.devs else {} for n in (ACCEL, ACCEL2, NUNCHUK, IR, MPLUS)}
-        self.imu.config(cfg.get("motionplus", {}))
+        self.state = {n: abs_values(self.devs[n]) if n in self.devs else {} for n in (ACCEL, ACCEL2, NUNCHUK, IR, MPLUS, MPLUS2)}
+        for imu in self.imus.values():
+            imu.config(cfg.get("motionplus", {}))
         self.rumble = cfg["rumble"]["enabled"]
         m = MOUSE_DEFAULT | cfg.get("mouse", {})
         self.mouse_mode = m["enabled"]
@@ -458,7 +469,7 @@ class Bridge:
 
     def close_unused(self):
         needed = self.motion_devices()
-        for name in [n for n in self.devs if n in (ACCEL, ACCEL2, WIIMOTE2, IR, MPLUS) and n not in needed]:
+        for name in [n for n in self.devs if n in (ACCEL, ACCEL2, WIIMOTE2, IR, MPLUS, MPLUS2) and n not in needed]:
             self.devs.pop(name).close()
 
     def build_motions(self):
@@ -468,9 +479,11 @@ class Bridge:
         if self.levers:
             t = self.two
             lever = {"deadzone": t["deadzone"], "max": t["max"], "invert": t["invert"], "smoothing": LEVER_SMOOTHING}
+            # The gyro follows the hand without the accelerometer's shake noise; a remote without one keeps its tilt.
+            gyro = [t.get("use_motionplus", False) and r in self.mp_remotes for r in self.order[:2]]
             cfg = [m for m in cfg if m["target"] not in POD] + [
-                lever | {"source": "WIIMOTE_Y", "target": "POD_RIGHT", "center": t["center_right"]},
-                lever | {"source": "WIIMOTE2_Y", "target": "POD_LEFT", "center": t["center_left"]}]
+                lever | {"source": "WIIMOTE_LEVER" if gyro[0] else "WIIMOTE_Y", "target": "POD_RIGHT", "center": t["center_right"]},
+                lever | {"source": "WIIMOTE2_LEVER" if gyro[1] else "WIIMOTE2_Y", "target": "POD_LEFT", "center": t["center_left"]}]
         self.motions = [Motion(m, self.play) for m in cfg]
         self.pod = {m.target: 0.0 for m in self.motions if m.target in POD}
 
@@ -480,6 +493,8 @@ class Bridge:
             needed |= {ACCEL} | ({MPLUS} if self.use_mplus else set()) | ({IR} if self.use_ir else set())
         if MPLUS in needed:
             needed.add(ACCEL)  # the Imu also reads the accelerometer
+        if MPLUS2 in needed:
+            needed.add(ACCEL2)
         if ACCEL2 in needed:
             needed.add(WIIMOTE2)  # the left lever's buttons work too
         return needed
@@ -505,13 +520,14 @@ class Bridge:
         if self.released:
             return
         order = sorted(remotes(), reverse=self.two.get("swap", False))
-        if order != self.order:  # a remote came or went, or left and right changed: every place is new
-            for name in (WIIMOTE, WIIMOTE2, ACCEL, ACCEL2, IR, MPLUS):
+        mp = {owner for _, name, owner in inputs() if name == MPLUS}
+        if order != self.order or mp != self.mp_remotes:  # a remote or MotionPlus came or went, or sides changed
+            for name in (WIIMOTE, WIIMOTE2, ACCEL, ACCEL2, IR, MPLUS, MPLUS2):
                 if name in self.devs:
                     self.drop(name)
-            self.order = order
+            self.order, self.mp_remotes = order, mp
             self.build_motions()
-        extra = tuple(self.motion_devices() & {ACCEL, ACCEL2, WIIMOTE2, IR, MPLUS})
+        extra = tuple(self.motion_devices() & {ACCEL, ACCEL2, WIIMOTE2, IR, MPLUS, MPLUS2})
         for name in (WIIMOTE, NUNCHUK) + extra:
             if name in self.devs:
                 continue
@@ -546,8 +562,8 @@ class Bridge:
 
     def handle(self, ev, name):
         if ev.type == e.EV_SYN:
-            if name == MPLUS:
-                self.imu.update(self.state[MPLUS], self.state[ACCEL], ev.timestamp())
+            if name in self.imus:
+                self.imus[name].update(self.state[name], self.state[ACCEL2 if name == MPLUS2 else ACCEL], ev.timestamp())
             if self.mouse_mode:
                 if self.aiming:
                     self.update_aim(name, ev.timestamp())
@@ -802,6 +818,9 @@ class Bridge:
 
 if __name__ == "__main__":
     try:
-        Bridge(Path(sys.argv[1]) if len(sys.argv) > 1 else CONFIG).run()
+        bridge = Bridge(Path(sys.argv[1]) if len(sys.argv) > 1 else CONFIG)
+        # Third-party MotionPlus units appear as MPLUS devices through this thread.
+        threading.Thread(target=rawmplus.run, args=(lambda: bridge.released,), daemon=True).start()
+        bridge.run()
     except KeyboardInterrupt:
         pass

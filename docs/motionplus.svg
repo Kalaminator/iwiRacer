@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 230" width="960" height="230" role="img" aria-label="Modo Wiimote más Nunchuk más MotionPlus. Inclinar la punta del Wiimote da el motor derecho. Girarlo como un volante da la dirección. Un golpe de muñeca da X, el derrape. Al conectar, deja el mando quieto un segundo."><style>text{font-family:sans-serif}</style><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#bd5600"/>
+    </marker>
+    <g id="side">
+      <rect x="-45" y="-8" width="90" height="16" rx="5" fill="#bd5600"/>
+      <rect x="33" y="-8" width="12" height="16" rx="3" fill="#14222b" opacity=".55"/>
+      <circle cx="20" cy="-8" r="2.5" fill="#f7fafb"/>
+    </g>
+    <g id="front">
+      <rect x="-32" y="-15" width="64" height="30" rx="10" fill="#bd5600"/>
+      <rect x="-14" y="-15" width="28" height="6" rx="2" fill="#14222b" opacity=".55"/>
+    </g>
+  </defs><rect width="960" height="230" rx="6" fill="#f7fafb"/>
+  <g font-size="13" fill="#14222b" text-anchor="middle">
+    <text x="160" y="30" font-weight="700" font-size="15">Inclinar la punta</text>
+    <use href="#side" transform="translate(160 110)" opacity=".25"/>
+    <use href="#side" transform="translate(160 110) rotate(30)"/>
+    <path d="M220 90A70 70 0 0 1 214 150" stroke="#bd5600" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <text x="160" y="185">vista de lado</text>
+    <text x="160" y="208" font-weight="700" fill="#17805a">motor derecho (RT)</text>
+
+    <text x="480" y="30" font-weight="700" font-size="15">Girar como un volante</text>
+    <use href="#front" transform="translate(480 112)" opacity=".25"/>
+    <use href="#front" transform="translate(480 112) rotate(35)"/>
+    <path d="M425 70A70 70 0 0 1 535 70" stroke="#bd5600" stroke-width="2" fill="none" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <text x="480" y="185">vista desde atrás (botones arriba)</text>
+    <text x="480" y="208" font-weight="700" fill="#17805a">dirección (stick izq ↔)</text>
+
+    <text x="800" y="30" font-weight="700" font-size="15">Golpe de muñeca</text>
+    <use href="#front" transform="translate(800 112) rotate(-20)" opacity=".25"/>
+    <use href="#front" transform="translate(800 112) rotate(20)"/>
+    <path d="M760 60Q800 40 840 60" stroke="#bd5600" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+    <text x="800" y="185">mismo giro, rápido y corto</text>
+    <text x="800" y="208" font-weight="700" fill="#17805a">X (derrape)</text>
+  </g>
+</svg>

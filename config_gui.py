@@ -62,13 +62,20 @@ MOTION_DEFAULT = {"enabled": False, "source": "WIIMOTE_X", "target": "ABS_X", "c
                   "deadzone": 10, "max": 100, "anti_deadzone": 0, "invert": False, "smoothing": 0.7}
 ANTI_LABEL = "Empuje inicial % (anti-zona muerta)"
 POINTERS = [("WIIMOTE", "Wiimote (apuntar con el mando)"), ("STICK", "Stick del Nunchuk")]
-MODES = [("RACER", "Galactic Racer: Wiimote + Nunchuk"), ("RACER_TWO", "Galactic Racer: dos Wiimotes como palancas"),
+MODES = [("RACER", "Galactic Racer: Wiimote + Nunchuk"), ("RACER_MPLUS", "Galactic Racer: Wiimote + Nunchuk + MotionPlus"),
+         ("RACER_TWO", "Galactic Racer: dos Wiimotes como palancas"),
          ("MOUSE", "Ratón: puntero"), ("DOLPHIN", "Dolphin: Wiimote libre")]
 MODE_HELP = {"RACER": "El juego ve un mando Xbox. Home cambia a ratón.",
+             "RACER_MPLUS": "Inclinar el Wiimote = motor derecho, girarlo = dirección, golpe de muñeca = X (derrape).\n"
+                            "Al conectar, deja el Wiimote quieto 1 segundo.",
              "RACER_TWO": "Conecta dos Wiimotes sin Nunchuk. Cada uno es una palanca. El juego ve un mando Xbox.",
              "MOUSE": "El Wiimote mueve el puntero. Home cambia a mando.",
              "DOLPHIN": "El programa suelta los Wiimotes para Dolphin. Cierra esta ventana antes de abrir Dolphin."}
-TWO_DEFAULT = {"enabled": False, "swap": False, "center_left": 0, "center_right": 0, "deadzone": 15, "max": 70, "invert": True, "steer_range": 1.5}
+# Motions each racer mode switches on (True) or off (False); everything else stays as set in the tabs.
+MODE_MOTIONS = {"RACER_MPLUS": {"WIIMOTE_Y": False, "WIIMOTE_SHAKE": False,
+                                "WIIMOTE_PITCH": True, "WIIMOTE_ROLL": True, "GYRO_ROLL": True}}
+MODE_MOTIONS["RACER"] = MODE_MOTIONS["RACER_TWO"] = {k: not v for k, v in MODE_MOTIONS["RACER_MPLUS"].items()}
+TWO_DEFAULT = {"enabled": False, "use_motionplus": False, "swap": False, "center_left": 0, "center_right": 0, "deadzone": 15, "max": 70, "invert": True, "steer_range": 1.5}
 MPLUS_DEFAULT = {"invert_pitch": False, "invert_roll": False, "invert_yaw": False, "accel_time": 1.0, "yaw_return": 3.0}
 
 
@@ -425,7 +432,8 @@ class Window(QWidget):
                     "center_left": spin(t["center_left"], -100, 100), "center_right": spin(t["center_right"], -100, 100),
                     "deadzone": spin(t["deadzone"], 0, 60), "max": spin(t["max"], 10, 120),
                     "steer_range": dspin(t["steer_range"], 1, 3, 0.1),
-                    "invert": check(t["invert"], "Invertir adelante/atrás")}
+                    "invert": check(t["invert"], "Invertir adelante/atrás"),
+                    "use_motionplus": check(t["use_motionplus"], "Usar el MotionPlus si está (palanca más precisa y sin temblor)")}
         self.two_count = QLabel()
         self.lever_bars = [QProgressBar(), QProgressBar()]
         for bar in self.lever_bars:
@@ -449,6 +457,8 @@ class Window(QWidget):
                            ("steer_range", "Recorrido del giro (más = más fino)")):
             form.addRow(label, self.two[key])
         form.addRow(self.two["invert"])
+        form.addRow(self.two["use_motionplus"])
+        form.addRow(QLabel("Con MotionPlus, deja los mandos quietos 1 segundo al conectar."))
         return page
 
     def center_levers(self):
@@ -605,13 +615,22 @@ class Window(QWidget):
         mode = self.mode.currentData()
         self.mouse["enabled"].setChecked(mode == "MOUSE")
         self.two["enabled"].setChecked(mode == "RACER_TWO")
+        for w in self.motions:
+            on = MODE_MOTIONS.get(mode, {}).get(w["source"].currentData())
+            if on is not None:
+                w["enabled"].setChecked(on)
         self.save()
 
     def current_mode(self):
         """The mode the options really give, so the list stays true after a change by hand in a tab."""
         if self.mode.currentData() == "DOLPHIN":
             return "DOLPHIN"
-        return "MOUSE" if self.mouse["enabled"].isChecked() else "RACER_TWO" if self.two["enabled"].isChecked() else "RACER"
+        if self.mouse["enabled"].isChecked():
+            return "MOUSE"
+        if self.two["enabled"].isChecked():
+            return "RACER_TWO"
+        on = {w["source"].currentData() for w in self.motions if w["enabled"].isChecked()}
+        return "RACER_MPLUS" if "WIIMOTE_PITCH" in on else "RACER"
 
     def save(self):
         mode = self.current_mode()

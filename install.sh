@@ -12,7 +12,7 @@ sudo install -m 644 70-iwiracer.rules /etc/udev/rules.d/70-iwiracer.rules
 echo uinput | sudo tee /etc/modules-load.d/uinput.conf > /dev/null
 sudo modprobe uinput
 sudo udevadm control --reload
-sudo udevadm trigger --subsystem-match=misc --subsystem-match=input
+sudo udevadm trigger --subsystem-match=misc --subsystem-match=input --subsystem-match=hidraw
 
 mkdir -p "$HOME/.config/systemd/user" "$HOME/.local/share/applications"
 sed "s|@DIR@|$DIR|g" wiimote2xbox.service > "$HOME/.config/systemd/user/wiimote2xbox.service"

@@ -1,3 +1,6 @@
 # Lets the logged-in user create the virtual pad and read the Wii Remote sensors without root.
 KERNEL=="uinput", SUBSYSTEM=="misc", TAG+="uaccess", OPTIONS+="static_node=uinput"
 SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="Nintendo Wii Remote*", TAG+="uaccess"
+# Raw access to the Wii Remotes: third-party MotionPlus units are read directly, the kernel driver drops them.
+SUBSYSTEM=="hidraw", KERNELS=="0005:057E:0306.*", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0005:057E:0330.*", TAG+="uaccess"

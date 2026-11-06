@@ -10,7 +10,7 @@ No toca los archivos del juego. El juego solo ve un mando Xbox normal.
 - Movimiento: inclinar o agitar los mandos, y puntero IR.
 - Modo podracer: cada mando es una palanca de motor.
 - Dos Wiimotes sin Nunchuk, como un solo mando.
-- MotionPlus: giroscopio para ángulos más estables y golpes de muñeca.
+- MotionPlus (también los no oficiales): giroscopio para ángulos más estables y golpes de muñeca.
 - Modo ratón: Home cambia entre mando y ratón. El puntero se mueve con el Wiimote o con el stick del Nunchuk.
 - Interfaz para configurarlo todo, con vista del mando en directo.
 
@@ -21,7 +21,7 @@ No toca los archivos del juego. El juego solo ve un mando Xbox normal.
 | Botones y vibración | Mando real |
 | Movimiento, IR, ratón | Datos simulados |
 | Dos Wiimotes como palancas | Dos mandos reales en Galactic Racer. Los ajustes aún están en prueba |
-| MotionPlus | Datos simulados. Viene apagado: falta comprobar el sentido de sus ejes |
+| MotionPlus | Dos MotionPlus no oficiales reales: sentido de los ejes medido. Falta probar en el juego |
 | Wiimote + Nunchuk en Galactic Racer | Aún sin probar |
 
 Solo se ha probado en Arch Linux.
@@ -82,6 +82,7 @@ Abre **iwiRacer** en el menú de aplicaciones. Pulsa **Guardar y aplicar** despu
 
 - **Modo:** la lista de arriba aplica el cambio al momento. Solo activa o apaga estas opciones. El resto de tus ajustes no cambia.
   - **Galactic Racer: Wiimote + Nunchuk**
+  - **Galactic Racer: Wiimote + Nunchuk + MotionPlus:** consulta [Pilotar con MotionPlus](#pilotar-con-motionplus).
   - **Galactic Racer: dos Wiimotes como palancas**
   - **Ratón: puntero**
   - **Dolphin: Wiimote libre:** el programa suelta los Wiimotes. Cierra la ventana antes de abrir Dolphin. Sin probar con Dolphin.
@@ -96,7 +97,31 @@ Abre **iwiRacer** en el menú de aplicaciones. Pulsa **Guardar y aplicar** despu
   3. **Inclinación:** sin los otros dos, inclinas el mando. Cuanto más lo inclinas, más rápido va el puntero. Solo mide inclinación, no giro a izquierda o derecha. La posición al entrar en modo ratón es el centro.
 
   El estabilizador usa el filtro 1 €, reduce el temblor y para el puntero un momento al hacer clic.
-- **MotionPlus:** deja el Wiimote quieto 1 segundo al conectarlo.
+- **MotionPlus:** deja el Wiimote quieto 1 segundo al conectarlo. Así aprende su punto cero.
+
+## Pilotar con MotionPlus
+
+Elige el modo **Galactic Racer: Wiimote + Nunchuk + MotionPlus**. El Nunchuk sigue igual.
+
+![Inclinar la punta da el motor derecho, girar como un volante da la dirección y un golpe de muñeca da X](docs/motionplus.svg)
+
+Al conectar, deja el Wiimote quieto 1 segundo.
+
+### MotionPlus no oficiales
+
+El driver de Linux (`hid-wiimote`) no reconoce muchos MotionPlus no oficiales: los detecta y los quita un segundo después. En el registro del kernel sale `cannot detect extension; 00:00:a4:20:05:05`.
+
+iwiRacer lee esos MotionPlus directamente (`rawmplus.py`, por `/dev/hidraw*`). El instalador da el permiso. No tienes que hacer nada más. Los botones, el acelerómetro, el IR y la vibración siguen por el driver normal.
+
+Para comprobar el sentido de los ejes de tus MotionPlus (apaga antes el servicio):
+
+```sh
+systemctl --user stop wiimote2xbox
+.venv/bin/python test_motionplus.py
+systemctl --user start wiimote2xbox
+```
+
+Mueve los mandos cuando lo pida. Copia los valores `invert_*` que salen en la pestaña **MotionPlus**.
 
 ## Pilotar con dos Wiimotes
 
@@ -117,6 +142,8 @@ Regla fácil: **la nave gira hacia el lado del mando que va más atrás.** Los �
 ### Qué hace el programa
 
 ![De la inclinación de cada Wiimote al mando Xbox](docs/flujo.svg)
+
+Si el Wiimote tiene MotionPlus, el giroscopio ayuda a medir la inclinación: la palanca tiembla menos y responde antes. Los ajustes no cambian. Opción **Usar el MotionPlus si está** en la pestaña **Dos Wiimotes** (`use_motionplus`). Un mando sin MotionPlus usa solo el acelerómetro.
 
 Cada motor llega a las dos salidas. Si un motor va adelante y el otro atrás, el que va atrás quita empuje: 100 % adelante y 68 % atrás dan 32 % de empuje.
 
@@ -147,6 +174,7 @@ Están en la pestaña **Dos Wiimotes** (sección `[two_wiimotes]` de `config.tom
 | Recorrido máximo (`max`) | 70 | Inclinación para el empuje máximo. 70 son 44°. |
 | Centro izquierda (`center_left`) | −1 | Lo que lee el mando izquierdo cuando está recto. |
 | Centro derecha (`center_right`) | 12 | Lo que lee el mando derecho cuando está recto. |
+| Usar el MotionPlus si está (`use_motionplus`) | sí | El giroscopio ayuda a medir la inclinación. |
 
 Los centros dependen de cada mando. Mide los tuyos en la pestaña **Dos Wiimotes**.
 

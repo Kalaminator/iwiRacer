@@ -1,5 +1,6 @@
 """Mouse mode with simulated sensors. Needs no real device and leaves the running daemon alone."""
 import math
+import re
 import random
 import tempfile
 from pathlib import Path
@@ -35,7 +36,7 @@ class Fake:
 def bridge(**mouse):
     w.make_pad, w.make_mouse = Fake, Fake
     text = Path(w.CONFIG).read_text()
-    base = text.split("[mouse]")[0] + "[mouse]\nenabled = true\ntoggle = \"BTN_MODE\"\n"
+    base = re.sub(r"invert_(pitch|roll|yaw) = true", r"invert_\1 = false", text.split("[mouse]")[0]) + "[mouse]\nenabled = true\ntoggle = \"BTN_MODE\"\n"  # tests assume no invert
     extra = "".join(f"{k} = {str(v).lower() if isinstance(v, bool) else repr(v)}\n".replace("'", '"') for k, v in mouse.items())
     tail = "\n[mouse_buttons]\nBTN_SOUTH = \"BTN_LEFT\"\nKEY_UP = \"WHEEL_UP\"\n"
     path = Path(tempfile.mkstemp(suffix=".toml")[1])
@@ -372,4 +373,23 @@ path.write_text(path.read_text().replace("DOLPHIN", "RACER"))
 b.load()
 path.unlink()
 assert not b.released
+# Two levers with MotionPlus: the gyro's forward tilt drives the engine, in the accelerometer's units.
+b = bridge()
+b.two |= {"enabled": True, "use_motionplus": True, "center_right": 0, "center_left": 0}
+b.order, b.mp_remotes, b.mouse_mode = ["r1", "r2"], {"r1"}, False
+b.build_motions()
+assert [m.how for m in b.motions if m.target in w.POD] == ["LEVER", e.ABS_RY]  # r2 has no MotionPlus: tilt as before
+assert w.MPLUS in b.motion_devices() and w.ACCEL in b.motion_devices()
+b.devs |= {w.MPLUS: None, w.ACCEL: None, w.ACCEL2: None}
+b.state[w.ACCEL] = flat()
+t = 1.0
+for i in range(100):
+    t += 0.01
+    report(b, w.MPLUS, gyro(), t)
+assert abs(b.pod["POD_RIGHT"]) < 0.01
+for i in range(50):  # tip forward 40 degrees at 80 deg/s; the accelerometer is still flat, so only the gyro moves it
+    t += 0.01
+    report(b, w.MPLUS, gyro(p=80), t)
+lever = b.state[w.MPLUS]["LEVER"]
+assert 40 < lever < 70 and b.pod["POD_RIGHT"] != 0, lever  # 100 * sin(40) = 64, minus a little lean to the flat accelerometer
 print("ok")

@@ -227,6 +227,7 @@ deadzone = 8
 max = 70
 steer_range = 1.5
 invert = true
+use_motionplus = true
 
 [left_buttons]
 BTN_SOUTH = "BTN_EAST"
@@ -243,8 +244,8 @@ KEY_RIGHT = "DPAD_RIGHT"
 
 [motionplus]
 invert_pitch = false
-invert_roll = false
-invert_yaw = false
+invert_roll = true
+invert_yaw = true
 accel_time = 1.0
 yaw_return = 3.0
 
